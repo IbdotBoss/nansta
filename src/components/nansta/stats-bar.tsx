@@ -1,5 +1,7 @@
 import { NanstaReport } from '@/lib/types';
 import { fmtUsd } from '@/lib/format';
+import SpotlightCard from './spotlight-card';
+import CountUp from './count-up';
 
 interface StatsBarProps {
   report: NanstaReport;
@@ -15,42 +17,40 @@ export function StatsBar({ report }: StatsBarProps) {
   const defiWallets = report.defi_analysis.filter(d => !d.protocols.error).length;
 
   const stats = [
-    { label: '7D Net Flow', value: fmtUsd(totalFlow7d), positive: totalFlow7d >= 0, accent: totalFlow7d >= 0 },
-    { label: '24H Net Flow', value: fmtUsd(totalFlow24h), positive: totalFlow24h >= 0, accent: false },
-    { label: 'Active Tokens', value: String(activeTokens), accent: false },
-    { label: 'Avg Conviction', value: `${avgScore}/100`, accent: false },
-    { label: 'DeFi Wallets', value: String(defiWallets), accent: false },
+    { label: '7D Net Flow', value: totalFlow7d, prefix: '$', positive: totalFlow7d >= 0 },
+    { label: '24H Net Flow', value: totalFlow24h, prefix: '$', positive: totalFlow24h >= 0 },
+    { label: 'Active Tokens', value: activeTokens, positive: undefined as boolean | undefined },
+    { label: 'Avg Conviction', value: avgScore, suffix: '/100', positive: undefined },
+    { label: 'DeFi Wallets', value: defiWallets, positive: undefined },
   ];
 
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
       {stats.map(stat => (
-        <div
-          key={stat.label}
-          className="rounded-2xl border border-white/[0.06] bg-zinc-950/50 backdrop-blur-2xl p-6
-            hover:border-white/[0.1] transition-all duration-300 group"
-        >
-          <div className="text-[10px] uppercase tracking-[0.15em] text-zinc-500 mb-3 font-medium">
+        <SpotlightCard key={stat.label} className="p-5">
+          <div className="text-[10px] uppercase tracking-widest text-zinc-500 mb-2 font-medium">
             {stat.label}
           </div>
-          <div className={`text-2xl font-bold font-mono tracking-tight ${
+          <div className={`text-xl font-bold font-mono tracking-tight tabular-nums ${
             stat.positive !== undefined
               ? stat.positive ? 'text-emerald-400' : 'text-red-400'
-              : 'text-white'
+              : 'text-zinc-100'
           }`}>
-            {stat.value}
+            <CountUp
+              to={Math.abs(stat.value)}
+              duration={1.5}
+              delay={0.2}
+              prefix={stat.prefix || ''}
+              suffix={stat.suffix || ''}
+              className="inline"
+            />
           </div>
-          {stat.accent && stat.positive !== undefined && (
-            <div className="mt-3 h-0.5 rounded-full bg-zinc-800/60 overflow-hidden">
-              <div
-                className={`h-full rounded-full transition-all duration-700 ${
-                  stat.positive ? 'bg-emerald-500/60' : 'bg-red-500/60'
-                }`}
-                style={{ width: '75%' }}
-              />
+          {stat.positive !== undefined && (
+            <div className={`mt-3 h-0.5 rounded-full ${stat.positive ? 'bg-emerald-500/20' : 'bg-red-500/20'}`}>
+              <div className={`h-full rounded-full w-3/4 transition-all duration-1000 ${stat.positive ? 'bg-emerald-500/50' : 'bg-red-500/50'}`} />
             </div>
           )}
-        </div>
+        </SpotlightCard>
       ))}
     </div>
   );
