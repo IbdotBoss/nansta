@@ -1,6 +1,5 @@
 import { NanstaReport } from '@/lib/types';
 import { fmtUsd } from '@/lib/format';
-import { Card, CardContent } from '@/components/ui/card';
 
 interface StatsBarProps {
   report: NanstaReport;
@@ -26,28 +25,32 @@ export function StatsBar({ report }: StatsBarProps) {
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
       {stats.map(stat => (
-        <Card
+        <div
           key={stat.label}
-          className="bg-zinc-950/80 border-zinc-800/40 backdrop-blur-sm hover:border-zinc-700/50 transition-all duration-200 group"
+          className="rounded-2xl border border-white/[0.06] bg-zinc-950/50 backdrop-blur-2xl p-6
+            hover:border-white/[0.1] transition-all duration-300 group"
         >
-          <CardContent className="p-5">
-            <div className="text-[10px] uppercase tracking-widest text-zinc-500 mb-1.5 font-medium">
-              {stat.label}
+          <div className="text-[10px] uppercase tracking-[0.15em] text-zinc-500 mb-3 font-medium">
+            {stat.label}
+          </div>
+          <div className={`text-2xl font-bold font-mono tracking-tight ${
+            stat.positive !== undefined
+              ? stat.positive ? 'text-emerald-400' : 'text-red-400'
+              : 'text-white'
+          }`}>
+            {stat.value}
+          </div>
+          {stat.accent && stat.positive !== undefined && (
+            <div className="mt-3 h-0.5 rounded-full bg-zinc-800/60 overflow-hidden">
+              <div
+                className={`h-full rounded-full transition-all duration-700 ${
+                  stat.positive ? 'bg-emerald-500/60' : 'bg-red-500/60'
+                }`}
+                style={{ width: '75%' }}
+              />
             </div>
-            <div className={`text-lg font-semibold font-mono tracking-tight ${
-              stat.positive !== undefined
-                ? stat.positive ? 'text-emerald-400' : 'text-red-400'
-                : 'text-zinc-200'
-            }`}>
-              {stat.value}
-            </div>
-            {stat.accent && stat.positive !== undefined && (
-              <div className={`mt-2 h-0.5 rounded-full ${stat.positive ? 'bg-emerald-500/30' : 'bg-red-500/30'}`}>
-                <div className={`h-full rounded-full w-3/4 ${stat.positive ? 'bg-emerald-500/60' : 'bg-red-500/60'}`} />
-              </div>
-            )}
-          </CardContent>
-        </Card>
+          )}
+        </div>
       ))}
     </div>
   );
